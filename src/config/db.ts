@@ -1,9 +1,10 @@
+import { DATABASE_URL } from "./index";
 import mongoose from "mongoose";
 
 export const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI as string);
-    console.log("MongoDB Connected");
+    await mongoose.connect(DATABASE_URL as string);
+    console.log("MongoDB Connected Successfully.");
   } catch (error) {
     console.error(error);
     process.exit(1);
