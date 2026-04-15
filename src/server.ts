@@ -1,13 +1,69 @@
 import dotenv from "dotenv";
 dotenv.config();
-
+import mongoose from "mongoose";
+import http from "http";
+import cluster from "node:cluster";
+import os from "node:os";
 import app from "./app";
 import { connectDB } from "./config/db";
+import { IP } from "./config";
 
 const PORT = process.env.PORT || 5000;
-
-connectDB();
 
 app.listen(PORT, () => {
   console.log(`Server running on port : ${PORT}`);
 });
+
+const port = Number(PORT) || 3700;
+const numCPUs = os.cpus().length;
+
+async function main() {
+  const server = http.createServer(app);
+  try {
+    connectDB();
+    // Start cron jobs
+    // startJob();
+    // initSocket(server);
+    // console.log("Socket.IO initialised!");
+
+    // Start server
+    // port ---> "10.10.11.84"
+    server.listen(port, IP, () => {
+      console.log(`Server is running on Port : ${port}`);
+    });
+
+    // Handle exceptions per worker
+    process.on("unhandledRejection", (err) => {
+      console.error(`Server Unhandled rejection:`, err);
+    });
+
+    process.on("uncaughtException", (error) => {
+      console.error(`Server Uncaught exception:`, error);
+    });
+
+    process.on("SIGINT", () => {
+      console.log("SIGINT signal received, shutting down...");
+      process.exit(0);
+    });
+  } catch (error) {
+    console.error(`Server failed to start:`, error);
+    process.exit(1);
+  }
+}
+
+if (cluster.isPrimary && process.env.NODE_ENV === "production") {
+  // Fork workers only in production
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on("exit", (worker) => {
+    console.log(`Worker ${worker.process.pid} died. Forking a new one...`);
+    cluster.fork();
+  });
+} else {
+  // In development, run single process for faster startup
+  main().catch((err) => {
+    console.error("Server failed to start:", err);
+  });
+}
