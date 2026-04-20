@@ -6,15 +6,8 @@ import cluster from "node:cluster";
 import os from "node:os";
 import app from "./app";
 import { connectDB } from "./config/db";
-import { IP } from "./config";
+import { IP, PORT } from "./config";
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port : ${PORT}`);
-});
-
-const port = Number(PORT) || 3700;
 const numCPUs = os.cpus().length;
 
 async function main() {
@@ -28,8 +21,8 @@ async function main() {
 
     // Start server
     // port ---> "10.10.11.84"
-    server.listen(port, IP, () => {
-      console.log(`Server is running on Port : ${port}`);
+    server.listen(Number(PORT), IP, () => {
+      console.log(`Server is running on Port : ${PORT}`);
     });
 
     // Handle exceptions per worker
