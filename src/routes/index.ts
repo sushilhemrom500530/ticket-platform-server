@@ -1,28 +1,33 @@
 import express from "express";
-// import { UserRoutes } from "../modules/user/user.route";
-// import { AuthRoutes } from "./../modules/auth/auth.route";
-// import { NotificationRoutes } from "./../modules/notifications/notification.route";
-// import { CommonRoutes } from "./../modules/common/common.route";
+import { UserRoutes } from "../models/user/user.route";
+import { AuthRoutes } from "../models/auth/auth.route";
+import { CategoryRoutes } from "../models/category/category.route";
+import { EventRoutes } from "../models/event/event.route";
+import { TicketRoutes } from "../models/ticket/ticket.route";
 
 const router = express.Router();
 
 const apiRoutes: any[] = [
-  //   {
-  //     path: "/auth",
-  //     route: AuthRoutes,
-  //   },
-  //   {
-  //     path: "/user",
-  //     route: UserRoutes,
-  //   },
-  //   {
-  //     path: "/notification",
-  //     route: NotificationRoutes,
-  //   },
-  //   {
-  //     path: "/common",
-  //     route: CommonRoutes,
-  //   },
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
+  {
+    path: "/user",
+    route: UserRoutes,
+  },
+  {
+    path: "/categories",
+    route: CategoryRoutes,
+  },
+  {
+    path: "/events",
+    route: EventRoutes,
+  },
+  {
+    path: "/tickets",
+    route: TicketRoutes,
+  },
 ];
 
 apiRoutes.forEach((route) => {

@@ -3,11 +3,11 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserService } from "./user.service";
 import { uploadToS3 } from "./../../middlewares/fileUploadHandler";
-import { JwtUserPayload } from "./../../middlewares/auth";
 import { UserStatus } from "./user.constant";
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errors/AppError";
 import { User } from "./user.model";
+import { JwtUserPayload } from "../../middlewares/auth";
 
 const getAll = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAll(req.query as any);

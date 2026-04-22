@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const changeUserStatus = z.object({
-  status: z.enum(["active", "inactive", "blocked", "suspended"], {
+  status: z.enum(["active", "inactive", "blocked", "suspended"] as const, {
     required_error: "Status is required",
     invalid_type_error:
       "Invalid status value, you can use 'active', 'inactive' , 'blocked' or 'suspended'",

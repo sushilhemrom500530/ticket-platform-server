@@ -1,6 +1,6 @@
 import mongoose, { model, Schema } from "mongoose";
 import { IUser, IOTP } from "./user.interface";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import validator from "validator";
 
 const userSchema = new Schema<IUser>(
@@ -85,7 +85,7 @@ const OTPSchema = new Schema<IOTP>({
 });
 
 // Pre-save hook for hashing password
-userSchema.pre<IUser>("save", async function (next) {
+userSchema.pre("save", async function (next: any) {
   if (!this.isModified("password")) return next();
 
   try {
@@ -93,7 +93,7 @@ userSchema.pre<IUser>("save", async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (err) {
-    next(err as any);
+    next(err);
   }
 });
 

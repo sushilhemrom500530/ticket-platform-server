@@ -13,7 +13,7 @@ const numCPUs = os.cpus().length;
 async function main() {
   const server = http.createServer(app);
   try {
-    connectDB();
+    await connectDB();
     // Start cron jobs
     // startJob();
     // initSocket(server);
