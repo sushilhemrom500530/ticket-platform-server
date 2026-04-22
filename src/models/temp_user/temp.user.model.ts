@@ -1,7 +1,8 @@
-import mongoose, { model, Schema } from "mongoose";
-import { IUser, IOTP } from "./user.interface";
+import { model, Schema } from "mongoose";
+
 import bcrypt from "bcryptjs";
 import validator from "validator";
+import { IUser } from "./../user/user.interface";
 
 const userSchema = new Schema<IUser>(
   {
@@ -61,28 +62,6 @@ const userSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-// OTP Schema
-const OTPSchema = new Schema<IOTP>({
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-  },
-  otp: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-  expiresAt: {
-    type: Date,
-    required: true,
-  },
-});
 
 
 // Pre-save hook for hashing password
@@ -100,7 +79,4 @@ userSchema.pre("save", async function (next: any) {
 
 
 // user model
-export const User = model<IUser>("User", userSchema);
-
-// OTP model
-export const OTP = mongoose.model<IOTP>("Otp", OTPSchema);
+export const TempUser = model<IUser>("TempUser", userSchema);

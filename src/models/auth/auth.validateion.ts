@@ -3,31 +3,28 @@ import { z } from "zod";
 export const registerSchema = z
   .object({
     fullName: z.string({
-      required_error: "Name is required",
+      message: "Name is required",
     }),
 
     email: z
       .string({
-        required_error: "Email is required",
+        message: "Email is required",
       })
       .email("Invalid email"),
 
     password: z
       .string({
-        required_error: "Password is required",
+        message: "Password is required",
       })
       .min(6, "Password must be at least 6 characters"),
 
     confirmPassword: z
       .string({
-        required_error: "Confirm password is required",
+        message: "Confirm password is required",
       })
       .min(6, "Confirm password must be at least 6 characters"),
 
-    role: z.enum(["admin", "parent", "teen"], {
-      required_error: "Role is required",
-      invalid_type_error: "Invalid role",
-    }),
+    role: z.enum(["admin", "parent", "teen"] as const),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
@@ -43,32 +40,32 @@ const loginUserSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z
     .string({
-      required_error: "Password is required",
+      message: "Password is required",
     })
     .min(6, "Confirm password must be at least 6 characters"),
 });
 
 const otpSchema = z.object({
   otp: z.string({
-    required_error: "Otp is required",
+    message: "Otp is required",
   }),
 });
 
 const forgotPasswordSchema = z.object({
   email: z
-    .string({ required_error: "Email is required" })
+    .string({ message: "Email is required" })
     .email("Invalid email"),
 });
 
 const resetPasswordSchema = z.object({
   newPassword: z
     .string({
-      required_error: "Password is required",
+      message: "Password is required",
     })
     .min(6, "Confirm password must be at least 6 characters"),
   confirmPassword: z
     .string({
-      required_error: "Confirm password is required",
+      message: "Confirm password is required",
     })
     .min(6, "Confirm password must be at least 6 characters"),
 });
@@ -76,37 +73,33 @@ const resetPasswordSchema = z.object({
 const changePasswordSchema = z.object({
   oldPassword: z
     .string({
-      required_error: "Old password is required",
+      message: "Old password is required",
     })
     .min(6, "Confirm password must be at least 6 characters"),
   newPassword: z
     .string({
-      required_error: "New password is required",
+      message: "New password is required",
     })
     .min(6, "New password must be at least 6 characters"),
   confirmPassword: z
     .string({
-      required_error: "Confirm password is required",
+      message: "Confirm password is required",
     })
     .min(6, "Confirm password must be at least 6 characters"),
 });
 
 const googleLoginSchema = z.object({
   idToken: z.string({
-    required_error: "Google ID token is required",
+    message: "Google ID token is required",
   }),
-  role: z.enum(["customer", "provider"], {
-    required_error: "Role is required for new users",
-  }),
+  role: z.enum(["customer", "provider"] as const),
 });
 
 const appleLoginSchema = z.object({
   identityToken: z.string({
-    required_error: "Apple identity token is required",
+    message: "Apple identity token is required",
   }),
-  role: z.enum(["customer", "provider"], {
-    required_error: "Role is required for new users",
-  }),
+  role: z.enum(["customer", "provider"] as const),
   user: z
     .object({
       name: z

@@ -26,7 +26,7 @@ const getAllCategories = catchAsync(async (req: Request, res: Response) => {
 
 const deleteCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await CategoryService.deleteCategory(id);
+  const result = await CategoryService.deleteCategory(id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

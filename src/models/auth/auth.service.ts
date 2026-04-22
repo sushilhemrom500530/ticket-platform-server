@@ -11,7 +11,7 @@ import {
   getStoredOTP,
   sendOTPEmail,
 } from "./../send-email/sendEmailService";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { TempUser } from "./../temp_user/temp.user.model";
 
 const userRegister = async (payload: IUser) => {

@@ -7,7 +7,7 @@ import { uploadToS3 } from "./../../middlewares/fileUploadHandler";
 
 const createEvent = catchAsync(async (req: Request, res: Response) => {
   const eventData = { ...req.body };
-  
+
   const files = req.files as { image?: Express.Multer.File[] };
   if (files?.image?.[0]) {
     eventData.image = await uploadToS3(files.image[0]);
@@ -37,7 +37,7 @@ const getAllEvents = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await EventService.getSingleEvent(id);
+  const result = await EventService.getSingleEvent(id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -55,7 +55,7 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
     eventData.image = await uploadToS3(files.image[0]);
   }
 
-  const result = await EventService.updateEvent(id, eventData);
+  const result = await EventService.updateEvent(id as string, eventData);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -66,7 +66,7 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
 
 const deleteEvent = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await EventService.deleteEvent(id);
+  const result = await EventService.deleteEvent(id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

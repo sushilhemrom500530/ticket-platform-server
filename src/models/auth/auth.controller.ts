@@ -7,7 +7,7 @@ import { AuthService } from "./auth.service";
 import { JwtUserPayload } from "./../../middlewares/auth";
 import AppError from "./../../errors/AppError";
 import { User } from "./../user/user.model";
-import { TempUser } from "./../temp_user/temp.user.model";
+import { TempUser } from "../temp_user/temp.user.model";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const userData = req.body as any;

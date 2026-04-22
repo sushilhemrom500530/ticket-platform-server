@@ -1,8 +1,15 @@
 {
-  "include": ["src"], // which files to compile
-  "exclude": ["node_modules"], // which files to skip
+  "include": [
+    "src"
+  ], // which files to compile
+  "exclude": [
+    "node_modules"
+  ], // which files to skip
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types", "./types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
     /* Visit https://aka.ms/tsconfig to read more about this file */
     /* Projects */
     // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
