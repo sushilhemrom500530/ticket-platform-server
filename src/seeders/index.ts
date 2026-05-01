@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-// import { User } from "./../modules/user/user.model";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./../config/index";
+import { User } from "../models/user/user.model";
 
 const MONGODB_URI = process.env.DATABASE_URL;
 
@@ -16,23 +16,23 @@ async function seedDatabase() {
       email: ADMIN_EMAIL as string,
       password: ADMIN_PASSWORD as string,
       role: "admin" as const,
-      phone_number: "01767122497",
-      dateOfBirth: new Date("2000-01-01"),
+      phoneNumber: "01767122497",
+      dateOfBirth: "2000-01-01",
     };
 
     console.log("👤 Checking for existing admin...");
 
-    // const existingAdmin = await User.findOne({ email: adminUser.email });
+    const existingAdmin = await User.findOne({ email: adminUser.email });
 
-    // if (!existingAdmin) {
-    //   console.log("🆕 Admin not found. Creating admin user...");
+    if (!existingAdmin) {
+      console.log("🆕 Admin not found. Creating admin user...");
 
-    //   await User.create(adminUser);
+      await User.create(adminUser);
 
-    //   console.log("✅ Admin user created successfully!");
-    // } else {
-    //   console.log("ℹ️ Admin already exists. Skipping creation.");
-    // }
+      console.log("✅ Admin user created successfully!");
+    } else {
+      console.log("ℹ️ Admin already exists. Skipping creation.");
+    }
 
     // YOUR OTHER SEEDING LOGIC (users, providers, etc.)
     console.log("\n🎉 Admin setup completed!");

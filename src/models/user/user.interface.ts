@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: IRole;
+  phoneNumber: string;
   dateOfBirth?: string;
   profilePhoto?: string;
   provider?: "google" | "apple";

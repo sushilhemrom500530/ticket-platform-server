@@ -36,6 +36,10 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
     profilePhoto: {
       type: String,
       default:
@@ -93,7 +97,7 @@ userSchema.pre("save", async function (next: any) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
-  } catch (err) {
+  } catch (err: any) {
     next(err);
   }
 });
