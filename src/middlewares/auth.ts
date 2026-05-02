@@ -11,8 +11,13 @@ export type IRole = "admin" | "parent" | "teen";
 
 export const auth = (...roles: IRole[]): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
-    // console.log(" token: ", token);
+    const authHeader = req.headers.authorization;
+    const cookieToken = req.cookies.token;
+    const token = authHeader?.split(" ")[1] || cookieToken;
+
+    // console.log("Authorization Header:", authHeader);
+    // console.log("Cookie Token:", cookieToken);
+    // console.log("Final Token:", token);
 
     if (!token) {
       console.log("Access denied. No token provided");

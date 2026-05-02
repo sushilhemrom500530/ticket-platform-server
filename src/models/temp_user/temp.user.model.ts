@@ -65,15 +65,14 @@ const userSchema = new Schema<IUser>(
 
 
 // Pre-save hook for hashing password
-userSchema.pre("save", async function (next: any) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
+  } catch (err: any) {
+    throw err;
   }
 });
 

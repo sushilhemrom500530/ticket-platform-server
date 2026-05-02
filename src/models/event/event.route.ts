@@ -12,7 +12,7 @@ router.post(
   auth("admin"),
   multiUploadHandler([{ name: "image", maxCount: 1 }]),
   (req, res, next) => {
-    if (req.body.data) {
+    if (req.body && req.body.data) {
       req.body = JSON.parse(req.body.data);
     }
     next();
@@ -29,7 +29,7 @@ router.put(
   auth("admin"),
   multiUploadHandler([{ name: "image", maxCount: 1 }]),
   (req, res, next) => {
-    if (req.body.data) {
+    if (req.body && req.body.data) {
       req.body = JSON.parse(req.body.data);
     }
     next();

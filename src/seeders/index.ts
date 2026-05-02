@@ -18,6 +18,7 @@ async function seedDatabase() {
       role: "admin" as const,
       phoneNumber: "01767122497",
       dateOfBirth: "2000-01-01",
+      status: "active" as const,
     };
 
     console.log("👤 Checking for existing admin...");
@@ -31,7 +32,10 @@ async function seedDatabase() {
 
       console.log("✅ Admin user created successfully!");
     } else {
-      console.log("ℹ️ Admin already exists. Skipping creation.");
+      console.log("ℹ️ Admin already exists. Ensuring status is active...");
+      existingAdmin.status = "active";
+      await existingAdmin.save();
+      console.log("✅ Admin status updated to active!");
     }
 
     // YOUR OTHER SEEDING LOGIC (users, providers, etc.)

@@ -45,7 +45,7 @@ const userRegister = async (payload: IUser) => {
 };
 
 const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email }).select("+password").lean();
+  const user = await User.findOne({ email: email.toLowerCase() }).select("+password").lean();
 
   if (!user) {
     throw new AppError(StatusCodes.BAD_REQUEST, "User not found");
