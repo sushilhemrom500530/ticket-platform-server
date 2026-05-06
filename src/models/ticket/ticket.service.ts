@@ -68,7 +68,7 @@ const getMyTickets = async (userId: string) => {
 const getAllTickets = async (query: any) => {
   const { page = 1, limit = 10, search } = query;
   const filter: any = {};
-  
+
   if (search) {
     filter.ticketId = { $regex: search, $options: "i" };
   }
