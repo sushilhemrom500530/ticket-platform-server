@@ -3,20 +3,23 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { EventService } from "./event.service";
 import { StatusCodes } from "http-status-codes";
-import { uploadToS3 } from "./../../middlewares/fileUploadHandler";
-
 const createEvent = catchAsync(async (req: Request, res: Response) => {
   const eventData = { ...req.body };
 
-  const files = req.files as { image?: Express.Multer.File[] };
-  if (files?.image?.[0]) {
-    eventData.image = await uploadToS3(files.image[0]);
+  // ✅ Get uploaded file URL from middleware
+  const files = req.body.files as {
+    image?: string;
+  };
+
+  if (files?.image) {
+    eventData.image = files.image;
   } else if (!eventData.image) {
-    // default placeholder if not provided
+    // ✅ fallback default
     eventData.image = "https://placehold.co/600x400?text=Event+Image";
   }
 
   const result = await EventService.createEvent(eventData);
+
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
@@ -50,9 +53,13 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const eventData = { ...req.body };
 
-  const files = req.files as { image?: Express.Multer.File[] };
-  if (files?.image?.[0]) {
-    eventData.image = await uploadToS3(files.image[0]);
+  // ✅ Get uploaded file URL from middleware
+  const files = req.body.files as {
+    image?: string;
+  };
+
+  if (files?.image) {
+    eventData.image = files.image;
   }
 
   const result = await EventService.updateEvent(id as string, eventData);

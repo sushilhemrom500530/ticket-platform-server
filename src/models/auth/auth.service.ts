@@ -38,7 +38,7 @@ const userRegister = async (payload: IUser) => {
   const { password, ...safeUser } = userObj;
 
   return {
-    results: safeUser,
+    user: safeUser,
     token: accessToken,
     refresh_token: refreshToken,
   };
@@ -94,7 +94,7 @@ const loginUser = async (email: string, password: string) => {
   const { password: _password, ...safeUser } = user;
 
   return {
-    results: safeUser,
+    user: safeUser,
     token: accessToken,
     refresh_token: refreshToken,
   };
@@ -181,7 +181,7 @@ const verifyOtp = async (req: Request, otp: string) => {
     JWT_SECRET_KEY as string,
     { expiresIn: "365d" },
   );
-  return { results: result, token: accessToken };
+  return { user: result, token: accessToken };
 };
 
 const resendOtp = async (email: string) => {

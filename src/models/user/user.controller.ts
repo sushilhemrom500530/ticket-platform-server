@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserService } from "./user.service";
-import { uploadToS3 } from "./../../middlewares/fileUploadHandler";
 import { UserStatus } from "./user.constant";
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errors/AppError";
@@ -65,18 +64,21 @@ const softDeleteUser = catchAsync(async (req: Request, res: Response) => {
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   const { id: userId } = req.user as JwtUserPayload;
+
   const userData = { ...req.body };
 
   const existingUser = await User.findById(userId).lean();
-  if (!existingUser)
+  if (!existingUser) {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  }
 
-  const files = req.files as {
-    profile?: Express.Multer.File[];
+  // ✅ GET FILE URL FROM MIDDLEWARE (Cloudinary)
+  const files = req.body.files as {
+    profile?: string;
   };
 
-  if (files?.profile?.[0]) {
-    userData.profilePhoto = await uploadToS3(files.profile[0]);
+  if (files?.profile) {
+    userData.profilePhoto = files.profile;
   }
 
   // Prevent role changes

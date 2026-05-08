@@ -44,4 +44,3 @@ router.patch(
 );
 
 export const UserRoutes = router;
- 

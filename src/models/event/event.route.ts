@@ -13,7 +13,11 @@ router.post(
   multiUploadHandler([{ name: "image", maxCount: 1 }]),
   (req, res, next) => {
     if (req.body && req.body.data) {
+      const files = (req.body as any).files;
       req.body = JSON.parse(req.body.data);
+      if (files) {
+        (req.body as any).files = files;
+      }
     }
     next();
   },
@@ -30,7 +34,11 @@ router.put(
   multiUploadHandler([{ name: "image", maxCount: 1 }]),
   (req, res, next) => {
     if (req.body && req.body.data) {
+      const files = (req.body as any).files;
       req.body = JSON.parse(req.body.data);
+      if (files) {
+        (req.body as any).files = files;
+      }
     }
     next();
   },
