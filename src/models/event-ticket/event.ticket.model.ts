@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IEventTicket } from "./event.join.user.interface";
+import { IEventTicket } from "./event.ticket.interface";
 
 const eventTicketSchema = new Schema<IEventTicket>(
     {

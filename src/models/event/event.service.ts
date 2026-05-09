@@ -18,7 +18,7 @@ const getAllEvents = async (query: any) => {
   }
 
   const skip = (Number(page) - 1) * Number(limit);
-  
+
   const events = await Event.find(filter)
     .populate("categoryId")
     .skip(skip)
