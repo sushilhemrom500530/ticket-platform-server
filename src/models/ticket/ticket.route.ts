@@ -8,14 +8,14 @@ const router = express.Router();
 
 router.post(
   "/purchase",
-  auth("admin", "parent", "teen"),
+  auth("admin", "organizer", "user"),
   validateRequest(ticketValidation.purchaseTicket),
   TicketController.purchaseTicket
 );
 
 router.get(
   "/my",
-  auth("admin", "parent", "teen"),
+  auth("admin", "organizer", "user"),
   TicketController.getMyTickets
 );
 

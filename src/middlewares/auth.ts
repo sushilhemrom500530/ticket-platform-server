@@ -7,7 +7,7 @@ export interface JwtUserPayload {
   role: IRole;
 }
 
-export type IRole = "admin" | "parent" | "teen";
+export type IRole = "admin" | "organizer" | "user";
 
 export const auth = (...roles: IRole[]): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {

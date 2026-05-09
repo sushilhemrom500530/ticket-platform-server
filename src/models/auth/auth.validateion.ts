@@ -24,7 +24,7 @@ export const registerSchema = z
       })
       .min(6, "Confirm password must be at least 6 characters"),
 
-    role: z.enum(["admin", "parent", "teen"] as const),
+    role: z.enum(["admin", "organizer", "user"] as const),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
@@ -92,14 +92,14 @@ const googleLoginSchema = z.object({
   idToken: z.string({
     message: "Google ID token is required",
   }),
-  role: z.enum(["customer", "provider"] as const),
+  role: z.enum(["admin", "organizer", "user"] as const),
 });
 
 const appleLoginSchema = z.object({
   identityToken: z.string({
     message: "Apple identity token is required",
   }),
-  role: z.enum(["customer", "provider"] as const),
+  role: z.enum(["admin", "organizer", "user"] as const),
   user: z
     .object({
       name: z

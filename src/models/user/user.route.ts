@@ -11,26 +11,26 @@ router.get("/all", auth("admin"), UserController.getAll);
 
 router.get(
   "/find/:id",
-  auth("admin", "parent", "teen"),
+  auth("admin", "organizer", "user"),
   UserController.getSingleUser,
 );
 
 router.patch(
   "/update-my-profile",
-  auth("admin", "parent", "teen"),
+  auth("admin", "organizer", "user"),
   multiUploadHandler([{ name: "profile", maxCount: 1 }]),
   UserController.updateMyProfile,
 );
 
 router.get(
   "/get-my-profile",
-  auth("admin", "parent", "teen"),
+  auth("admin", "user", "organizer"),
   UserController.getMyProfile,
 );
 
 router.patch(
   "/delete/my-account",
-  auth("admin", "parent", "teen"),
+  auth("admin", "organizer", "user"),
   UserController.softDeleteUser,
 );
 

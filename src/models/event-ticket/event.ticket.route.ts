@@ -1,24 +1,36 @@
 import express from "express";
-import { EventTicketController } from "./event.ticket.controller";
-import { auth } from "./../../middlewares/auth";
-import validateRequest from "./../../shared/validateRequest";
+
+import { auth } from "../../middlewares/auth";
+import validateRequest from "../../shared/validateRequest";
 import { eventTicketValidation } from "./event.ticket.validation";
+import { EventTicketController } from "./event.ticket.controller";
 
 const router = express.Router();
 
 router.post(
-    "/",
-    auth("admin", "parent", "teen"),
-    validateRequest(eventTicketValidation.createEventTicket),
-    EventTicketController.createEventTicket
+    "/purchase",
+    auth("user"),
+    validateRequest(
+        eventTicketValidation.purchaseTicket
+    ),
+    EventTicketController.purchaseTicket
 );
 
-router.get("/", auth("admin", "parent", "teen"), EventTicketController.getAllEventTickets);
+router.get(
+    "/my-tickets",
+    auth("user"),
+    EventTicketController.myTickets
+);
 
-router.get("/:id", auth("admin", "parent", "teen"), EventTicketController.getSingleEventTicket);
+router.get(
+    "/verify/:ticketNumber",
+    EventTicketController.verifyTicket
+);
 
-router.put("/:id", auth("admin", "parent", "teen"), validateRequest(eventTicketValidation.updateEventTicket), EventTicketController.updateEventTicket);
-
-router.delete("/:id", auth("admin"), EventTicketController.deleteEventTicket);
+router.patch(
+    "/check-in/:ticketNumber",
+    auth("admin"),
+    EventTicketController.checkInTicket
+);
 
 export const EventTicketRoutes = router;

@@ -1,13 +1,5 @@
 import { Types } from "mongoose";
 
-export type TicketStatus =
-    | "pending"
-    | "paid"
-    | "checked_in"
-    | "cancelled"
-    | "expired"
-    | "refunded";
-
 export interface IEventTicket {
     event: Types.ObjectId;
 
@@ -17,25 +9,20 @@ export interface IEventTicket {
 
     qrCode: string;
 
-    status: TicketStatus;
+    status:
+    | "pending"
+    | "paid"
+    | "checked_in"
+    | "cancelled"
+    | "expired";
 
     isUsed: boolean;
 
     usedAt?: Date;
 
-    checkedInBy?: Types.ObjectId;
+    price: number;
 
     paymentId?: string;
 
     transactionId?: string;
-
-    quantity: number;
-
-    price: number;
-
-    currency: string;
-
-    purchaseDate: Date;
-
-    expiresAt?: Date;
 }

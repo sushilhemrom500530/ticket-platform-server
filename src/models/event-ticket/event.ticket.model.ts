@@ -37,25 +37,17 @@ const eventTicketSchema = new Schema<IEventTicket>(
                 "checked_in",
                 "cancelled",
                 "expired",
-                "refunded",
             ],
-            default: "pending",
-            index: true,
+            default: "paid",
         },
 
         isUsed: {
             type: Boolean,
             default: false,
-            index: true,
         },
 
         usedAt: {
             type: Date,
-        },
-
-        checkedInBy: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
         },
 
         paymentId: {
@@ -64,33 +56,12 @@ const eventTicketSchema = new Schema<IEventTicket>(
 
         transactionId: {
             type: String,
-            index: true,
-        },
-
-        quantity: {
-            type: Number,
-            default: 1,
-            min: 1,
         },
 
         price: {
             type: Number,
             required: true,
             min: 0,
-        },
-
-        currency: {
-            type: String,
-            default: "BDT",
-        },
-
-        purchaseDate: {
-            type: Date,
-            default: Date.now,
-        },
-
-        expiresAt: {
-            type: Date,
         },
     },
     {

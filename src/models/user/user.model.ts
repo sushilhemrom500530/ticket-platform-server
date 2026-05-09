@@ -30,7 +30,7 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ["admin", "parent", "teen"],
+      enum: ["admin", "organizer", "user"],
     },
     dateOfBirth: {
       type: String,
