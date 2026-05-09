@@ -1,12 +1,41 @@
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 
-export interface IEventJoinUser extends Document {
+export type TicketStatus =
+    | "pending"
+    | "paid"
+    | "checked_in"
+    | "cancelled"
+    | "expired"
+    | "refunded";
+
+export interface IEventTicket {
     event: Types.ObjectId;
+
     user: Types.ObjectId;
-    status: "Pending" | "Accepted" | "Rejected";
+
     ticketNumber: string;
+
     qrCode: string;
 
-    createdAt?: Date;
-    updatedAt?: Date;
+    status: TicketStatus;
+
+    isUsed: boolean;
+
+    usedAt?: Date;
+
+    checkedInBy?: Types.ObjectId;
+
+    paymentId?: string;
+
+    transactionId?: string;
+
+    quantity: number;
+
+    price: number;
+
+    currency: string;
+
+    purchaseDate: Date;
+
+    expiresAt?: Date;
 }
