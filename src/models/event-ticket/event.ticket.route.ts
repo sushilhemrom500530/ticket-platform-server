@@ -27,6 +27,11 @@ router.get(
     EventTicketController.verifyTicket
 );
 
+router.get(
+    "/:id",
+    EventTicketController.getTicketById
+);
+
 router.patch(
     "/check-in/:ticketNumber",
     auth("admin"),

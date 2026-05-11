@@ -4,6 +4,8 @@ import { AuthRoutes } from "../models/auth/auth.route";
 import { CategoryRoutes } from "../models/category/category.route";
 import { EventRoutes } from "../models/event/event.route";
 import { TicketRoutes } from "../models/ticket/ticket.route";
+import { PaymentRoutes } from "../models/payment/payment.route";
+import { EventTicketRoutes } from "../models/event-ticket/event.ticket.route";
 
 const router = express.Router();
 
@@ -27,6 +29,14 @@ const apiRoutes: any[] = [
   {
     path: "/tickets",
     route: TicketRoutes,
+  },
+  {
+    path: "/event-tickets",
+    route: EventTicketRoutes,
+  },
+  {
+    path: "/payments",
+    route: PaymentRoutes,
   },
 ];
 

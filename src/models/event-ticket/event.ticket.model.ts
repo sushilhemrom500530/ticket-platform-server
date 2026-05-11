@@ -38,7 +38,7 @@ const eventTicketSchema = new Schema<IEventTicket>(
                 "cancelled",
                 "expired",
             ],
-            default: "paid",
+            default: "pending",
         },
 
         isUsed: {
@@ -62,6 +62,35 @@ const eventTicketSchema = new Schema<IEventTicket>(
             type: Number,
             required: true,
             min: 0,
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1,
+            default: 1,
+        },
+        vat: {
+            type: Number,
+            default: 0,
+        },
+        serviceCharge: {
+            type: Number,
+            default: 0,
+        },
+        totalFare: {
+            type: Number,
+        },
+        identificationType: {
+            type: String,
+        },
+        identificationNumber: {
+            type: String,
+        },
+        pnrNumber: {
+            type: String,
+        },
+        coPassenger1: {
+            type: String,
         },
     },
     {

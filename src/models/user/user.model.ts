@@ -31,14 +31,13 @@ const userSchema = new Schema<IUser>(
     role: {
       type: String,
       enum: ["admin", "organizer", "user"],
+      default: "user",
     },
     dateOfBirth: {
       type: String,
-      required: true,
     },
     phoneNumber: {
       type: String,
-      required: true,
     },
     profilePhoto: {
       type: String,

@@ -76,9 +76,23 @@ const myTickets = catchAsync(
     }
 );
 
+const getTicketById = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const result = await EventTicketService.getTicketById(id as string);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Ticket retrieved successfully",
+        data: result,
+    });
+});
+
 export const EventTicketController = {
     purchaseTicket,
     verifyTicket,
+    getTicketById,
     checkInTicket,
     myTickets,
 };

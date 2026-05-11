@@ -8,17 +8,22 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const transporter = nodemailer.createTransport({
-  // service: "gmail",
-  // host: "smtp.gmail.com",
-  // port: 465,
-  // secure: true,
-  host: "mail.betopiagroup.com",
-  port: 587,
-  secure: false,
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
   auth: {
     user: process.env.Nodemailer_GMAIL,
     pass: process.env.Nodemailer_GMAIL_PASSWORD,
   },
+  secure: true,
+
+  // host: "mail.betopiagroup.com",
+  // port: 587,
+  // secure: false,
+  // auth: {
+  //   user: process.env.Nodemailer_GMAIL,
+  //   pass: process.env.Nodemailer_GMAIL_PASSWORD,
+  // },
 });
 
 export const generateOTP = (): string => {
@@ -86,11 +91,11 @@ export const sendOTPEmail = async (
     <div class="email-wrapper">
       <div class="email-card">
         <div class="header">
-          <div class="logo">Lynkfolk</div>
+          <div class="logo">TP</div>
         </div>
         <div class="content">
           <h1 class="title">Verification Code</h1>
-          <p class="text">To securely sign in to your <strong>Lynkfolk</strong> account, please use the code below. This code will expire shortly.</p>
+          <p class="text">To securely sign in to your <strong>Ticket Platform</strong> account, please use the code below. This code will expire shortly.</p>
           
           <div class="otp-box">
             <div class="timer-badge">Valid for 3 minutes</div> 
@@ -100,12 +105,12 @@ export const sendOTPEmail = async (
           <p class="text" style="font-size: 13px;">If you didn't request this, you can safely ignore this email. Your account security is our priority.</p>
           
           <p class="text" style="margin-top: 30px; font-weight: 600; color: #2d3436;">
-            Thanks,<br>Team Lynkfolk
+            Thanks,<br>Team Ticket Platform
           </p>
         </div>
       </div>
       <div class="footer">
-        &copy; ${new Date().getFullYear()} Lynkfolk Inc. All rights reserved.
+        &copy; ${new Date().getFullYear()} Ticket Platform Inc. All rights reserved.
       </div>
     </div>
   </body>
@@ -113,11 +118,11 @@ export const sendOTPEmail = async (
   `;
 
   const mailOptions = {
-    from: `"Lynkfolk Security" <${process.env.Nodemailer_GMAIL}>`,
+    from: `"Ticket Platform Security" <${process.env.Nodemailer_GMAIL}>`,
     to: email,
-    subject: `${otp} is your Lynkfolk verification code`,
+    subject: `${otp} is your Ticket Platform verification code`,
     html: emailContent,
-    text: `Your Lynkfolk verification code is ${otp}. Valid for 3 minutes.`,
+    text: `Your Ticket Platform verification code is ${otp}. Valid for 3 minutes.`,
   };
 
   await transporter.sendMail(mailOptions);

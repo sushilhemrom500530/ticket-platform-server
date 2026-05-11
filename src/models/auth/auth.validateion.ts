@@ -18,23 +18,23 @@ export const registerSchema = z
       })
       .min(6, "Password must be at least 6 characters"),
 
-    confirmPassword: z
-      .string({
-        message: "Confirm password is required",
-      })
-      .min(6, "Confirm password must be at least 6 characters"),
+    // confirmPassword: z
+    //   .string({
+    //     message: "Confirm password is required",
+    //   })
+    //   .min(6, "Confirm password must be at least 6 characters"),
 
     role: z.enum(["admin", "organizer", "user"] as const),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
-      ctx.addIssue({
-        path: ["confirmPassword"],
-        message: "Passwords do not match",
-        code: z.ZodIssueCode.custom,
-      });
-    }
   });
+// .superRefine((data, ctx) => {
+//   if (data.password !== data.confirmPassword) {
+//     ctx.addIssue({
+//       path: ["confirmPassword"],
+//       message: "Passwords do not match",
+//       code: z.ZodIssueCode.custom,
+//     });
+//   }
+// });
 
 const loginUserSchema = z.object({
   email: z.string().email("Invalid email"),

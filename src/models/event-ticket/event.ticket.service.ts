@@ -121,9 +121,22 @@ const myTickets = async (userId: string) => {
     return result;
 };
 
+const getTicketById = async (id: string) => {
+    const ticket = await EventTicket.findById(id)
+        .populate("event")
+        .populate("user");
+
+    if (!ticket) {
+        throw new AppError(StatusCodes.NOT_FOUND, "Ticket not found");
+    }
+
+    return ticket;
+};
+
 export const EventTicketService = {
     purchaseTicket,
     verifyTicket,
+    getTicketById,
     checkInTicket,
     myTickets,
 };

@@ -19,10 +19,19 @@ export interface IEventTicket {
     isUsed: boolean;
 
     usedAt?: Date;
+    quantity: number;
 
     price: number;
 
     paymentId?: string;
 
     transactionId?: string;
+
+    vat?: number;
+    serviceCharge?: number;
+    totalFare?: number;
+    identificationType?: string;
+    identificationNumber?: string;
+    pnrNumber?: string;
+    coPassenger1?: string;
 }
