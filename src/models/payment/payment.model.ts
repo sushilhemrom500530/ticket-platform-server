@@ -28,7 +28,7 @@ const paymentSchema = new Schema<IPayment>(
     },
     method: {
       type: String,
-      enum: ["bkash", "nagad"],
+      enum: ["bkash", "nagad", "sslcommerz"],
       required: true,
     },
     amount: {

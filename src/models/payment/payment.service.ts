@@ -2,9 +2,11 @@ import { EventTicket } from "../event-ticket/event.ticket.model";
 import { Payment } from "./payment.model";
 import { BkashService } from "./bkash.service";
 import { NagadService } from "./nagad.service";
+import { SSLCommerzService } from "./sslcommerz.service";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status-codes";
 import { Event } from "../event/event.model";
+import { User } from "../user/user.model";
 import { generateTicketNumber } from "../../utils/generateTicketNumber";
 import { generateQRCode } from "../../utils/generateQRCode";
 
@@ -13,7 +15,7 @@ export const PaymentService = {
     userId: string,
     eventId: string,
     quantity: number,
-    method: "bkash" | "nagad",
+    method: "bkash" | "nagad" | "sslcommerz",
     callbackURL: string
   ) => {
     // 1. Find the event
@@ -31,9 +33,14 @@ export const PaymentService = {
       throw new AppError(httpStatus.BAD_REQUEST, "Not enough tickets available");
     }
 
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
     const unitPrice = event.price || 0;
-    const vat = unitPrice * 0.05 * quantity; // Mock 5% VAT
-    const serviceCharge = 20 * quantity; // Mock 20 BDT service charge per ticket
+    const vat = unitPrice * 0.05 * quantity; // 5% VAT
+    const serviceCharge = 20 * quantity; // 20 BDT service charge per ticket
     const totalFare = (unitPrice * quantity) + vat + serviceCharge;
 
     // 3. Generate ticket number and QR
@@ -56,17 +63,19 @@ export const PaymentService = {
     });
 
     // 5. Create pending payment record
+    const transactionId = `TXN_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const payment = await Payment.create({
       user: userId,
       event: event._id,
       ticket: ticket._id,
-      transactionId: `TXN_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      transactionId,
       method,
       amount: totalFare,
       status: "pending",
     });
 
     let gatewayResponse;
+    let redirectURL;
 
     // 6. Initiate payment with respective gateway
     if (method === "bkash") {
@@ -75,37 +84,76 @@ export const PaymentService = {
         payment.transactionId,
         callbackURL
       );
+      redirectURL = gatewayResponse.redirectURL;
+      payment.paymentIntent = gatewayResponse.paymentID;
     } else if (method === "nagad") {
       gatewayResponse = await NagadService.createPayment(
         payment.amount,
         payment.transactionId,
         callbackURL
       );
+      redirectURL = gatewayResponse.redirectURL;
+      payment.paymentIntent = gatewayResponse.paymentRefId;
+    } else if (method === "sslcommerz") {
+      const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+      gatewayResponse = await SSLCommerzService.initPayment({
+        total_amount: payment.amount,
+        tran_id: transactionId,
+        success_url: `${backendUrl}/api/v1/payments/sslcommerz/success?tran_id=${transactionId}`,
+        fail_url: `${backendUrl}/api/v1/payments/sslcommerz/fail?tran_id=${transactionId}`,
+        cancel_url: `${backendUrl}/api/v1/payments/sslcommerz/cancel?tran_id=${transactionId}`,
+        cus_name: user.fullName || "Guest User",
+        cus_email: user.email,
+        cus_phone: "01767122497",
+        // cus_phone: user.phoneNumber || "01700000000",
+        product_name: event.title || "Event Ticket",
+        product_category: "Ticket",
+      });
+
+      if (gatewayResponse?.status === "SUCCESS" && gatewayResponse?.GatewayPageURL) {
+        redirectURL = gatewayResponse.GatewayPageURL;
+        payment.paymentIntent = transactionId; // For SSL, tran_id is the primary identifier
+      } else {
+        const reason = gatewayResponse?.failedreason || "Gateway initialization failed";
+        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, `SSLCommerz failed: ${reason}`);
+      }
     } else {
       throw new AppError(httpStatus.BAD_REQUEST, "Invalid payment method");
     }
 
-    // Update payment with intent/ref id
-    payment.paymentIntent =
-      method === "bkash"
-        ? (gatewayResponse as any).paymentID
-        : (gatewayResponse as any).paymentRefId;
     await payment.save();
 
     return {
       payment,
       ticketId: ticket._id,
-      redirectURL: gatewayResponse?.redirectURL,
+      redirectURL,
     };
   },
 
   verifyPayment: async (
-    paymentIntent: string,
-    method: "bkash" | "nagad"
+    paymentIntent: string, // This will be val_id for SSLCommerz
+    method: "bkash" | "nagad" | "sslcommerz",
+    tran_id?: string // Optional tran_id for SSLCommerz lookup
   ) => {
-    const payment = await Payment.findOne({ paymentIntent });
+    // For SSLCommerz, if we have tran_id, use it. Otherwise use paymentIntent as tranId if it's not a val_id.
+    // Actually, in the success handler, we now pass val_id as paymentIntent.
+    let payment;
+    if (method === "sslcommerz") {
+      // Try to find by transactionId first if we can guess it, but usually we need to find the record to update it.
+      // Since we don't store val_id yet, we should find the pending payment for this session.
+      // A better way is to pass tran_id to this function as well.
+      payment = await Payment.findOne({ 
+        $or: [
+          { paymentIntent: paymentIntent },
+          { transactionId: tran_id }
+        ]
+      });
+    } else {
+      payment = await Payment.findOne({ paymentIntent });
+    }
+    
     if (!payment) {
-      throw new AppError(httpStatus.NOT_FOUND, "Payment intent not found");
+      throw new AppError(httpStatus.NOT_FOUND, "Payment record not found");
     }
 
     if (payment.status === "paid") {
@@ -113,16 +161,29 @@ export const PaymentService = {
     }
 
     let verificationResult;
+    let isSuccess = false;
+
     if (method === "bkash") {
       verificationResult = await BkashService.executePayment(paymentIntent);
+      isSuccess = verificationResult?.status === "Completed";
     } else if (method === "nagad") {
       verificationResult = await NagadService.verifyPayment(paymentIntent);
+      isSuccess = verificationResult?.status === "Success";
+    } else if (method === "sslcommerz") {
+      // For SSLCommerz, we verify using validation API with val_id
+      verificationResult = await SSLCommerzService.validatePayment(paymentIntent);
+      isSuccess = verificationResult?.status === "VALID" || verificationResult?.status === "VALIDATED";
     }
 
-    if (verificationResult?.status === "Completed" || verificationResult?.status === "Success") {
+    if (isSuccess) {
       payment.status = "paid";
       payment.paidAt = new Date();
-      payment.transactionId = (verificationResult as any).trxID || (verificationResult as any).trxId || payment.transactionId;
+      if (method !== "sslcommerz") {
+        payment.transactionId = verificationResult.trxID || verificationResult.trxId || payment.transactionId;
+      } else {
+        payment.bankTransactionId = verificationResult.bank_tran_id;
+        payment.paymentIntent = paymentIntent; // Store the val_id
+      }
       await payment.save();
 
       // Update ticket status and event sold tickets
@@ -145,6 +206,13 @@ export const PaymentService = {
 
     payment.status = "failed";
     await payment.save();
+
+    // Also mark ticket as cancelled if payment fails
+    if (payment.ticket) {
+      await EventTicket.findByIdAndUpdate(payment.ticket, { status: "cancelled" });
+    }
+
     throw new AppError(httpStatus.BAD_REQUEST, "Payment verification failed");
   },
 };
+
