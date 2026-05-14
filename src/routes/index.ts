@@ -6,6 +6,11 @@ import { EventRoutes } from "../models/event/event.route";
 import { TicketRoutes } from "../models/ticket/ticket.route";
 import { PaymentRoutes } from "../models/payment/payment.route";
 import { EventTicketRoutes } from "../models/event-ticket/event.ticket.route";
+import { FavoriteRoutes } from "../models/favorite/favorite.route";
+import { NotificationRoutes } from "../models/notification/notification.route";
+import { CouponRoutes } from "../models/coupon/coupon.route";
+import { ReportRoutes } from "../models/report/report.route";
+import { SupportRoutes } from "../models/support/support.route";
 
 const router = express.Router();
 
@@ -37,6 +42,26 @@ const apiRoutes: any[] = [
   {
     path: "/payments",
     route: PaymentRoutes,
+  },
+  {
+    path: "/favorites",
+    route: FavoriteRoutes,
+  },
+  {
+    path: "/notifications",
+    route: NotificationRoutes,
+  },
+  {
+    path: "/coupons",
+    route: CouponRoutes,
+  },
+  {
+    path: "/reports",
+    route: ReportRoutes,
+  },
+  {
+    path: "/support",
+    route: SupportRoutes,
   },
 ];
 

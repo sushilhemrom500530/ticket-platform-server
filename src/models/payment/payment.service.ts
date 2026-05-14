@@ -214,5 +214,11 @@ export const PaymentService = {
 
     throw new AppError(httpStatus.BAD_REQUEST, "Payment verification failed");
   },
+
+  getMyPaymentsFromDB: async (userId: string) => {
+    return await Payment.find({ user: userId })
+      .populate("event")
+      .sort({ createdAt: -1 });
+  },
 };
 

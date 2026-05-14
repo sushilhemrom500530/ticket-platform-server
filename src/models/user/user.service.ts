@@ -4,16 +4,19 @@ import AppError from "./../../errors/AppError";
 import { StatusCodes } from "http-status-codes";
 
 const getAll = async (query: any) => {
-  const { search, date, page = 1, limit = 10 } = query;
+  const { search, role, page = 1, limit = 10, date } = query;
+  const filter: any = {};
 
-  const filter: any = {
-    role: ["parent", "teen"],
-  };
+  if (role) {
+    filter.role = role;
+  }
 
   if (search) {
-    const trimSearch = search.trim();
-    filter.fullName = { $regex: trimSearch, $options: "i" };
-    filter.email = { $regex: trimSearch, $options: "i" };
+    const trimSearch = (search as string).trim();
+    filter.$or = [
+      { fullName: { $regex: trimSearch, $options: "i" } },
+      { email: { $regex: trimSearch, $options: "i" } },
+    ];
   }
 
   if (date) {
@@ -23,7 +26,7 @@ const getAll = async (query: any) => {
     const end = new Date(date);
     end.setUTCHours(23, 59, 59, 999);
 
-    filter.created_at = { $gte: start, $lte: end };
+    filter.createdAt = { $gte: start, $lte: end };
   }
 
   const skip = (page - 1) * limit;
@@ -31,19 +34,16 @@ const getAll = async (query: any) => {
   const users = await User.find(filter)
     .skip(skip)
     .limit(limit)
-    .sort({ created_at: -1 })
+    .sort({ createdAt: -1 })
     .lean();
 
   const totalUsers = await User.countDocuments(filter);
 
-  if (users.length === 0) {
-    return [];
-  }
   return {
     meta: {
       totalResult: totalUsers,
-      currentPage: page,
-      limit,
+      currentPage: Number(page),
+      limit: Number(limit),
       totalPages: Math.ceil(totalUsers / limit),
     },
     results: users,

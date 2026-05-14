@@ -77,6 +77,18 @@ const sslIpn = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.OK).send("IPN Received");
 });
 
+const getMyPayments = catchAsync(async (req: Request, res: Response) => {
+  const { id: userId } = req.user as JwtUserPayload;
+  const result = await PaymentService.getMyPaymentsFromDB(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Payment history fetched successfully",
+    data: result,
+  });
+});
+
 export const PaymentController = {
   createPayment,
   verifyPayment,
@@ -84,5 +96,6 @@ export const PaymentController = {
   sslFail,
   sslCancel,
   sslIpn,
+  getMyPayments,
 };
 

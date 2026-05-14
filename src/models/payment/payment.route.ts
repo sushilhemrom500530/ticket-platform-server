@@ -29,5 +29,11 @@ router.post("/sslcommerz/ipn", PaymentController.sslIpn);
 // Use GET for success redirect from gateway if configured that way
 router.get("/sslcommerz/success", PaymentController.sslSuccess);
 
+router.get(
+  "/my",
+  auth("admin", "user", "organizer"),
+  PaymentController.getMyPayments
+);
+
 export const PaymentRoutes = router;
 
