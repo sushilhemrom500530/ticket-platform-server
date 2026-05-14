@@ -40,6 +40,7 @@ export const ReportService = {
       nextDate.setDate(nextDate.getDate() + 1);
 
       const dayTickets = allTickets.filter(t => {
+        if (!t.createdAt) return false;
         const ticketDate = new Date(t.createdAt);
         return ticketDate >= date && ticketDate < nextDate;
       });
