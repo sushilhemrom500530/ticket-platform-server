@@ -4,3 +4,6 @@ node_modules
 /logs
 distuploads/
 /build 
+.vercel
+/dist
+.dist
