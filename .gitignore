@@ -5,5 +5,4 @@ node_modules
 distuploads/
 /build 
 .vercel
-/dist
-.dist
+/dist 
