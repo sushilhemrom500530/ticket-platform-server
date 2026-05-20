@@ -1,9 +1,8 @@
 node_modules
-.env
 /public
 /logs
 distuploads/
 /build 
 .vercel
-/dist
-.dist
+/dist 
+config.bat
