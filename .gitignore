@@ -6,3 +6,5 @@ distuploads/
 /build 
 .vercel
 /dist 
+config.bat
+

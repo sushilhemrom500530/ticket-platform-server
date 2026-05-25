@@ -7,6 +7,8 @@ import os from "node:os";
 import app from "./app";
 import { connectDB } from "./config/db";
 import { IP, PORT } from "./config";
+import 'dotenv/config';
+
 
 const numCPUs = os.cpus().length;
 
