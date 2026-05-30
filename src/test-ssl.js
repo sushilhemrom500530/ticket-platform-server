@@ -22,7 +22,7 @@ const paymentData = {
   cus_city: "Dhaka",
   cus_postcode: "1000",
   cus_country: "Bangladesh",
-  cus_phone: "01700000000",
+  cus_phone: "01859011700",
 };
 
 const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);

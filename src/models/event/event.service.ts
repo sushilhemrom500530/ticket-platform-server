@@ -1,6 +1,7 @@
 import { Event } from "./event.model";
 import AppError from "./../../errors/AppError";
 import { StatusCodes } from "http-status-codes";
+import { Category } from "../category/category.model";
 
 const createEvent = async (payload: any) => {
   const result = await Event.create(payload);
@@ -8,13 +9,38 @@ const createEvent = async (payload: any) => {
 };
 
 const getAllEvents = async (query: any) => {
-  const { categoryId, isPremium, search, limit = 10, page = 1 } = query;
+  const {
+    category,
+    isPremium,
+    search,
+    limit = 10,
+    page = 1,
+  } = query;
+
   const filter: any = {};
 
-  if (categoryId) filter.categoryId = categoryId;
-  if (isPremium !== undefined) filter.isPremium = isPremium === "true";
+  // category wise filter
+  if (category) {
+    const categoryData = await Category.findOne({
+      name: { $regex: category, $options: "i" },
+    });
+
+    if (categoryData) {
+      filter.categoryId = categoryData._id;
+    }
+  }
+
+  // premium filter
+  if (isPremium !== undefined) {
+    filter.isPremium = isPremium === "true";
+  }
+
+  // search filter
   if (search) {
-    filter.title = { $regex: search, $options: "i" };
+    filter.title = {
+      $regex: search,
+      $options: "i",
+    };
   }
 
   const skip = (Number(page) - 1) * Number(limit);

@@ -318,6 +318,13 @@ const resetPassword = async (req: Request) => {
   user.password = newPassword;
   await user.save();
 
+  // Generate new JWT after password change
+  const accessToken = jwt.sign(
+    { id: user._id, email: user.email, role: user.role },
+    JWT_SECRET_KEY as string,
+    { expiresIn: "30d" },
+  );
+
   return {
     message: "Password reset successful",
   };
