@@ -8,6 +8,7 @@ export interface IUser extends Document {
   role: IRole;
   phoneNumber: string;
   dateOfBirth?: string;
+  address?: string;
   profilePhoto?: string;
   provider?: "google" | "apple";
   providerId?: string;

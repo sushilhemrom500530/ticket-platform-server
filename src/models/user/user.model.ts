@@ -36,6 +36,9 @@ const userSchema = new Schema<IUser>(
     dateOfBirth: {
       type: String,
     },
+    address: {
+      type: String,
+    },
     phoneNumber: {
       type: String,
     },

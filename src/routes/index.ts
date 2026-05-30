@@ -20,7 +20,7 @@ const apiRoutes: any[] = [
     route: AuthRoutes,
   },
   {
-    path: "/user",
+    path: "/users",
     route: UserRoutes,
   },
   {
