@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
-interface MockPaymentResponse {
+interface BkashPaymentResponse {
   paymentID: string;
   createTime: string;
   orgLogo: string;
@@ -13,35 +13,106 @@ interface MockPaymentResponse {
   redirectURL: string;
 }
 
+const getBaseUrl = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+  return isProduction
+    ? "https://tokenized.pay.bka.sh/v1.2.0-beta/tokenized/checkout"
+    : "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout";
+};
+
+const getHeaders = (token: string) => {
+  return {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    authorization: token,
+    "x-app-key": process.env.BKASH_APP_KEY,
+  };
+};
+
+const getToken = async (): Promise<string> => {
+  const baseUrl = getBaseUrl();
+  const response = await axios.post(
+    `${baseUrl}/token/grant`,
+    {
+      app_key: process.env.BKASH_APP_KEY,
+      app_secret: process.env.BKASH_APP_SECRET,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        username: process.env.BKASH_USERNAME,
+        password: process.env.BKASH_PASSWORD,
+      },
+    }
+  );
+
+  if (response.data.errorCode) {
+    throw new Error(`bKash Token Grant Failed: ${response.data.errorMessage} (Code: ${response.data.errorCode})`);
+  }
+
+  return response.data.id_token;
+};
+
 export const BkashService = {
-  createPayment: async (amount: number, invoiceNumber: string, callbackURL: string): Promise<MockPaymentResponse> => {
-    // Mocking bKash create payment response
-    const paymentID = `BKASH_${uuidv4()}`;
+  createPayment: async (amount: number, invoiceNumber: string, callbackURL: string): Promise<BkashPaymentResponse> => {
+    const token = await getToken();
+    const baseUrl = getBaseUrl();
     
-    // In a real implementation, this redirectURL would go to bKash's hosted payment page.
-    // For our mock, we will redirect straight to the callbackURL but append some success query params.
-    const redirectURL = `${callbackURL}?paymentID=${paymentID}&status=success`;
+    const response = await axios.post(
+      `${baseUrl}/create`,
+      {
+        mode: "0011",
+        payerReference: invoiceNumber,
+        callbackURL,
+        amount: amount.toString(),
+        currency: "BDT",
+        intent: "sale",
+        merchantInvoiceNumber: invoiceNumber,
+      },
+      {
+        headers: getHeaders(token),
+      }
+    );
+
+    if (response.data.errorCode) {
+      throw new Error(`bKash Create Payment Failed: ${response.data.errorMessage} (Code: ${response.data.errorCode})`);
+    }
 
     return {
-      paymentID,
-      createTime: new Date().toISOString(),
-      orgLogo: "bkash-logo.png",
-      orgName: "Ticket Platform",
-      transactionStatus: "Initiated",
-      amount: amount.toString(),
-      currency: "BDT",
-      intent: "sale",
-      merchantInvoiceNumber: invoiceNumber,
-      redirectURL,
+      paymentID: response.data.paymentID,
+      createTime: response.data.createTime,
+      orgLogo: response.data.orgLogo || "",
+      orgName: response.data.orgName || "",
+      transactionStatus: response.data.transactionStatus,
+      amount: response.data.amount,
+      currency: response.data.currency,
+      intent: response.data.intent,
+      merchantInvoiceNumber: response.data.merchantInvoiceNumber,
+      redirectURL: response.data.bkashURL, // Map bkashURL to redirectURL
     };
   },
 
   executePayment: async (paymentID: string): Promise<{ trxID: string; status: string; amount: number }> => {
-    // Mocking bKash execute payment response
+    const token = await getToken();
+    const baseUrl = getBaseUrl();
+    
+    const response = await axios.post(
+      `${baseUrl}/execute`,
+      { paymentID },
+      {
+        headers: getHeaders(token),
+      }
+    );
+
+    if (response.data.errorCode) {
+      throw new Error(`bKash Execute Payment Failed: ${response.data.errorMessage} (Code: ${response.data.errorCode})`);
+    }
+
     return {
-      trxID: `TRX_${paymentID.substring(0, 8)}`,
-      status: "Completed",
-      amount: 100, // mock amount
+      trxID: response.data.trxID,
+      status: response.data.transactionStatus,
+      amount: parseFloat(response.data.amount),
     };
   },
 };
