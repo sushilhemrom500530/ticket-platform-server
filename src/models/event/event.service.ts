@@ -20,19 +20,29 @@ const getAllEvents = async (query: any) => {
   const filter: any = {};
 
   // category wise filter
-  if (category) {
-    const categoryData = await Category.findOne({
-      name: { $regex: category, $options: "i" },
+  if (query.categoryId) {
+    const idsArray = typeof query.categoryId === 'string' ? query.categoryId.split(',') : query.categoryId;
+    filter.categoryId = { $in: idsArray };
+  } else if (category) {
+    const categoriesArray = typeof category === 'string' ? category.split(',') : category;
+    const categoryData = await Category.find({
+      name: { $in: categoriesArray.map((c: string) => new RegExp(`^${c}$`, 'i')) },
     });
-
-    if (categoryData) {
-      filter.categoryId = categoryData._id;
+    if (categoryData.length > 0) {
+      filter.categoryId = { $in: categoryData.map(c => c._id) };
     }
   }
 
   // premium filter
-  if (isPremium !== undefined) {
-    filter.isPremium = isPremium === "true";
+  if (isPremium !== undefined && isPremium !== "" && isPremium !== "all") {
+    const typesArray = typeof isPremium === 'string' ? isPremium.split(',') : [isPremium];
+    if (typesArray.includes("true") && typesArray.includes("false")) {
+      // both selected, no filter needed
+    } else if (typesArray.includes("true")) {
+      filter.isPremium = true;
+    } else if (typesArray.includes("false")) {
+      filter.isPremium = false;
+    }
   }
 
   // search filter

@@ -20,6 +20,7 @@ export const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
 export const WEB_HOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+export const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
 export const CLIENT_URL = process.env.CLIENT_URL;
 export const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL;
 export const SUPPORT_PHONE = process.env.SUPPORT_PHONE;
