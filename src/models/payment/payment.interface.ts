@@ -1,7 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "cancelled";
-export type PaymentMethod = "bkash" | "nagad" | "sslcommerz";
+export type PaymentMethod = "bkash" | "nagad" | "sslcommerz" | "stripe";
 
 export interface IPayment extends Document {
   user: Types.ObjectId;

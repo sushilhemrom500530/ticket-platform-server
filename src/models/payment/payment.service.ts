@@ -3,6 +3,7 @@ import { Payment } from "./payment.model";
 import { BkashService } from "./bkash.service";
 import { NagadService } from "./nagad.service";
 import { SSLCommerzService } from "./sslcommerz.service";
+import stripe from "../../utils/stripe";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status-codes";
 import { Event } from "../event/event.model";
@@ -15,7 +16,7 @@ export const PaymentService = {
     userId: string,
     eventId: string,
     quantity: number,
-    method: "bkash" | "nagad" | "sslcommerz",
+    method: "bkash" | "nagad" | "sslcommerz" | "stripe",
     callbackURL: string
   ) => {
     // 1. Find the event
@@ -39,9 +40,9 @@ export const PaymentService = {
     }
 
     const unitPrice = event.price || 0;
-    const vat = unitPrice * 0.05 * quantity; // 5% VAT
-    const serviceCharge = 20 * quantity; // 20 BDT service charge per ticket
-    const totalFare = (unitPrice * quantity) + vat + serviceCharge;
+    const vat = 0; // Removed hidden VAT
+    const serviceCharge = 0; // Removed hidden service charge
+    const totalFare = unitPrice * quantity;
 
     // 3. Generate ticket number and QR
     const ticketNumber = generateTicketNumber();
@@ -117,6 +118,30 @@ export const PaymentService = {
         const reason = gatewayResponse?.failedreason || "Gateway initialization failed";
         throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, `SSLCommerz failed: ${reason}`);
       }
+    } else if (method === "stripe") {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        success_url: `${callbackURL}?paymentID={CHECKOUT_SESSION_ID}&status=success&method=stripe`,
+        cancel_url: `${callbackURL}?status=cancel&method=stripe`,
+        customer_email: user.email,
+        client_reference_id: transactionId,
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: event.title || "Event Ticket",
+                description: `Ticket for ${event.title}`,
+              },
+              unit_amount: Math.round(payment.amount * 100), // Stripe takes amounts in cents
+            },
+            quantity: 1, // Quantity is 1 because totalFare is already total cost
+          },
+        ],
+      });
+      redirectURL = session.url;
+      payment.paymentIntent = session.id;
     } else {
       throw new AppError(httpStatus.BAD_REQUEST, "Invalid payment method");
     }
@@ -131,8 +156,8 @@ export const PaymentService = {
   },
 
   verifyPayment: async (
-    paymentIntent: string, // This will be val_id for SSLCommerz
-    method: "bkash" | "nagad" | "sslcommerz",
+    paymentIntent: string, // This will be val_id for SSLCommerz or checkout session id for Stripe
+    method: "bkash" | "nagad" | "sslcommerz" | "stripe",
     tran_id?: string // Optional tran_id for SSLCommerz lookup
   ) => {
     // For SSLCommerz, if we have tran_id, use it. Otherwise use paymentIntent as tranId if it's not a val_id.
@@ -142,7 +167,7 @@ export const PaymentService = {
       // Try to find by transactionId first if we can guess it, but usually we need to find the record to update it.
       // Since we don't store val_id yet, we should find the pending payment for this session.
       // A better way is to pass tran_id to this function as well.
-      payment = await Payment.findOne({ 
+      payment = await Payment.findOne({
         $or: [
           { paymentIntent: paymentIntent },
           { transactionId: tran_id }
@@ -151,7 +176,7 @@ export const PaymentService = {
     } else {
       payment = await Payment.findOne({ paymentIntent });
     }
-    
+
     if (!payment) {
       throw new AppError(httpStatus.NOT_FOUND, "Payment record not found");
     }
@@ -173,6 +198,9 @@ export const PaymentService = {
       // For SSLCommerz, we verify using validation API with val_id
       verificationResult = await SSLCommerzService.validatePayment(paymentIntent);
       isSuccess = verificationResult?.status === "VALID" || verificationResult?.status === "VALIDATED";
+    } else if (method === "stripe") {
+      const session = await stripe.checkout.sessions.retrieve(paymentIntent);
+      isSuccess = session.payment_status === "paid";
     }
 
     if (isSuccess) {

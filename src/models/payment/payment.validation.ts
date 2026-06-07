@@ -8,7 +8,7 @@ export const PaymentValidation = {
     quantity: z.number({
       message: "Quantity is required",
     }).min(1),
-    method: z.enum(["bkash", "nagad", "sslcommerz"] as const, {
+    method: z.enum(["bkash", "nagad", "sslcommerz", "stripe"] as const, {
       message: "Payment method is required",
     }),
     callbackURL: z.string({
@@ -20,7 +20,7 @@ export const PaymentValidation = {
     paymentIntent: z.string({
       message: "Payment Intent/Ref ID is required",
     }),
-    method: z.enum(["bkash", "nagad", "sslcommerz"] as const, {
+    method: z.enum(["bkash", "nagad", "sslcommerz", "stripe"] as const, {
       message: "Payment method is required",
     }),
   }),
