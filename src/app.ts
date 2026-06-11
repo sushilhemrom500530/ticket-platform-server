@@ -57,11 +57,11 @@ app.use("/api/v1", router);
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    service: "Rehenrose Backend API",
+    service: "Ticket Platform Backend API",
     environment: process.env.NODE_ENV ?? "development",
     version: "1.0.0",
     timestamp: new Date().toISOString(),
-    message: "Rehenrose Backend is running successfully",
+    message: "Ticket Platform Backend is running successfully",
   });
 });
 
