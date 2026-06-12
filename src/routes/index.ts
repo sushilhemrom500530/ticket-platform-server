@@ -14,6 +14,9 @@ import { SupportRoutes } from "../models/support/support.route";
 
 const router = express.Router();
 
+import { BannerRoutes } from "../models/banner/banner.route";
+import { MenubarRoutes } from "../models/menubar/menubar.route";
+
 const apiRoutes: any[] = [
   {
     path: "/auth",
@@ -62,6 +65,14 @@ const apiRoutes: any[] = [
   {
     path: "/support",
     route: SupportRoutes,
+  },
+  {
+    path: "/settings/banners",
+    route: BannerRoutes,
+  },
+  {
+    path: "/settings/menubars",
+    route: MenubarRoutes,
   },
 ];
 
