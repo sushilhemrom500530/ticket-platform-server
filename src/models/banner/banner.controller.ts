@@ -5,7 +5,19 @@ import { BannerService } from "./banner.service";
 import { StatusCodes } from "http-status-codes";
 
 const createBanner = catchAsync(async (req: Request, res: Response) => {
-  const result = await BannerService.createBanner(req.body);
+  const bannerData = { ...req.body };
+
+  const files = req.body.files as {
+    image?: string;
+  };
+
+  if (files?.image) {
+    bannerData.coverImage = files.image;
+  } else if (!bannerData.coverImage) {
+    bannerData.coverImage = "https://placehold.co/600x400?text=Banner+Image";
+  }
+
+  const result = await BannerService.createBanner(bannerData);
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
@@ -26,7 +38,17 @@ const getAllBanners = catchAsync(async (req: Request, res: Response) => {
 
 const updateBanner = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await BannerService.updateBanner(id as string, req.body);
+  const bannerData = { ...req.body };
+
+  const files = req.body.files as {
+    image?: string;
+  };
+
+  if (files?.image) {
+    bannerData.coverImage = files.image;
+  }
+
+  const result = await BannerService.updateBanner(id as string, bannerData);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
