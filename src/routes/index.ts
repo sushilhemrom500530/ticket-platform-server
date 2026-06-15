@@ -16,6 +16,7 @@ const router = express.Router();
 
 import { BannerRoutes } from "../models/banner/banner.route";
 import { MenubarRoutes } from "../models/menubar/menubar.route";
+import { DashboardRoutes } from "../models/dashboard/dashboard.route";
 
 const apiRoutes: any[] = [
   {
@@ -73,6 +74,10 @@ const apiRoutes: any[] = [
   {
     path: "/settings/menubars",
     route: MenubarRoutes,
+  },
+  {
+    path: "/dashboard",
+    route: DashboardRoutes,
   },
 ];
 

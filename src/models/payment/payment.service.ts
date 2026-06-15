@@ -207,7 +207,7 @@ export const PaymentService = {
       payment.status = "paid";
       payment.paidAt = new Date();
       if (method !== "sslcommerz") {
-        payment.transactionId = verificationResult.trxID || verificationResult.trxId || payment.transactionId;
+        payment.transactionId = verificationResult?.trxID || verificationResult?.trxId || payment.transactionId;
       } else {
         payment.bankTransactionId = verificationResult.bank_tran_id;
         payment.paymentIntent = paymentIntent; // Store the val_id
