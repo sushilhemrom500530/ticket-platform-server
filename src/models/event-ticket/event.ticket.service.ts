@@ -102,13 +102,21 @@ const checkInTicket = async (ticketNumber: string) => {
 
     ticket.isUsed = true;
 
-    ticket.status = "checked_in";
+    ticket.entryStatus = "checked_in";
 
     ticket.usedAt = new Date();
 
     await ticket.save();
 
     return ticket;
+};
+
+const getAllTicket = async (query: any) => {
+    const result = await EventTicket.find()
+        .populate("event")
+        .sort({ createdAt: -1 });
+
+    return result;
 };
 
 const myTickets = async (userId: string) => {
@@ -139,4 +147,5 @@ export const EventTicketService = {
     getTicketById,
     checkInTicket,
     myTickets,
+    getAllTicket,
 };

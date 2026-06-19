@@ -41,6 +41,12 @@ const eventTicketSchema = new Schema<IEventTicket>(
             default: "pending",
         },
 
+        entryStatus: {
+            type: String,
+            enum: ["checked_in", "not_used"],
+            default: "not_used",
+        },
+
         isUsed: {
             type: Boolean,
             default: false,

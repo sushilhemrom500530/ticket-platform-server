@@ -27,6 +27,17 @@ const getMyTickets = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const findTicketById = catchAsync(async (req: Request, res: Response) => {
+  const { id: ticketId } = req.params;
+  const result = await TicketService.findTicketById(ticketId as string);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Ticket retrieved successfully",
+    data: result,
+  });
+});
+
 const getAllTickets = catchAsync(async (req: Request, res: Response) => {
   const result = await TicketService.getAllTickets(req.query);
   sendResponse(res, {
@@ -40,5 +51,6 @@ const getAllTickets = catchAsync(async (req: Request, res: Response) => {
 export const TicketController = {
   purchaseTicket,
   getMyTickets,
+  findTicketById,
   getAllTickets,
 };

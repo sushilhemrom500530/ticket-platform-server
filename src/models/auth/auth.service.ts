@@ -405,7 +405,7 @@ const findOrCreateUser = async (data: {
     profilePhoto: data.avatar,
   };
   if (!user) {
-    user = await User.create(userData);
+    user = await User.create({ ...userData, status: "active" } as any);
   }
 
   return user;

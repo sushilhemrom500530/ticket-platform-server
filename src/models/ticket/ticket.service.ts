@@ -65,6 +65,23 @@ const getMyTickets = async (userId: string) => {
   return tickets;
 };
 
+const findTicketById = async (ticketId: string) => {
+  if (!ticketId) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Ticket ID is required");
+  }
+  const ticket = await Ticket.findById(ticketId)
+    .populate({
+      path: "eventId",
+      select: "title date location image",
+    })
+    .populate({
+      path: "userId",
+      select: "fullName email",
+    })
+    .lean();
+  return ticket;
+};
+
 const getAllTickets = async (query: any) => {
   const { page = 1, limit = 10, search } = query;
   const filter: any = {};
@@ -99,5 +116,6 @@ const getAllTickets = async (query: any) => {
 export const TicketService = {
   purchaseTicket,
   getMyTickets,
+  findTicketById,
   getAllTickets,
 };

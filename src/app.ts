@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 import logger, { logHttpRequests } from "./logger/logger";
 import notFound from "./middlewares/notFound";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
+import { User } from "./models/user/user.model";
 dotenv.config();
 
 const app: Application = express();
@@ -54,7 +55,7 @@ app.use(logHttpRequests); // High-performance Pino logging
 // ------------------ Routes ------------------
 app.use("/api/v1", router);
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", async (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     service: "Ticket Platform Backend API",

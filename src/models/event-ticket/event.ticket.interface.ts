@@ -15,7 +15,7 @@ export interface IEventTicket {
     | "checked_in"
     | "cancelled"
     | "expired";
-
+    entryStatus: "checked_in" | "not_used";
     isUsed: boolean;
 
     usedAt?: Date;

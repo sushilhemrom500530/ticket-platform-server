@@ -20,6 +20,12 @@ router.get(
 );
 
 router.get(
+  "/find/:id",
+  auth("admin", "organizer", "user"),
+  TicketController.findTicketById
+);
+
+router.get(
   "/all",
   auth("admin"),
   TicketController.getAllTickets

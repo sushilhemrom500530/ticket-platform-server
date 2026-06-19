@@ -1,5 +1,4 @@
 import express from "express";
-
 import { auth } from "../../middlewares/auth";
 import validateRequest from "../../shared/validateRequest";
 import { eventTicketValidation } from "./event.ticket.validation";
@@ -14,6 +13,12 @@ router.post(
         eventTicketValidation.purchaseTicket
     ),
     EventTicketController.purchaseTicket
+);
+
+router.get(
+    "/get-all",
+    auth("admin"),
+    EventTicketController.getAllTicket
 );
 
 router.get(
