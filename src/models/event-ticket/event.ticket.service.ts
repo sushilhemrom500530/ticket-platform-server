@@ -112,7 +112,23 @@ const checkInTicket = async (ticketNumber: string) => {
 };
 
 const getAllTicket = async (query: any) => {
-    const result = await EventTicket.find()
+    const filter: Record<string, unknown> = {
+        status: "paid"
+    };
+
+    if (query.eventId) {
+        filter.event = query.eventId;
+    }
+
+    if (query.userId) {
+        filter.user = query.userId;
+    }
+
+    if (query.status) {
+        filter.status = query.status;
+    }
+
+    const result = await EventTicket.find(filter)
         .populate("event")
         .sort({ createdAt: -1 });
 
