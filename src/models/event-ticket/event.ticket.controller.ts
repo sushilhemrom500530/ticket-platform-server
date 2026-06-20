@@ -91,8 +91,12 @@ const myTickets = catchAsync(
 
 const getTicketById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const { id: userId } = req.user as JwtUserPayload;
 
-    const result = await EventTicketService.getTicketById(id as string);
+    const result = await EventTicketService.getTicketById(
+        id as string,
+        userId as string
+    );
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

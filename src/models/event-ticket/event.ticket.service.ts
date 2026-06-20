@@ -145,8 +145,8 @@ const myTickets = async (userId: string) => {
     return result;
 };
 
-const getTicketById = async (id: string) => {
-    const ticket = await EventTicket.findById(id)
+const getTicketById = async (id: string, userId: string) => {
+    const ticket = await EventTicket.findOne({ _id: id, user: userId })
         .populate("event")
         .populate("user");
 
