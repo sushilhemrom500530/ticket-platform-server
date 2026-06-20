@@ -2,6 +2,8 @@ import { Event } from "./event.model";
 import AppError from "./../../errors/AppError";
 import { StatusCodes } from "http-status-codes";
 import { Category } from "../category/category.model";
+import { EventTicket } from "../event-ticket/event.ticket.model";
+import { Types } from "mongoose";
 
 const createEvent = async (payload: any) => {
   const result = await Event.create(payload);
@@ -83,6 +85,78 @@ const getSingleEvent = async (id: string) => {
   return result;
 };
 
+const getSingleEventWithUsers = async (
+  eventId: string,
+  query: Record<string, any>
+) => {
+  const {
+    searchTerm,
+    page = 1,
+    limit = 10,
+    status,
+    ticketNumber,
+  } = query;
+
+  const event = await Event.findById(eventId)
+    .populate("categoryId")
+    .lean();
+
+  if (!event) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Event not found");
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const ticketFilter: any = {
+    event: new Types.ObjectId(eventId),
+  };
+
+  if (status) {
+    ticketFilter.status = status;
+  }
+
+  if (ticketNumber) {
+    ticketFilter.ticketNumber = {
+      $regex: ticketNumber,
+      $options: "i",
+    };
+  }
+
+  const tickets = await EventTicket.find(ticketFilter)
+    .populate({
+      path: "user",
+      select: "name email phone profileImage",
+      match: searchTerm
+        ? {
+          $or: [
+            { name: { $regex: searchTerm, $options: "i" } },
+            { email: { $regex: searchTerm, $options: "i" } },
+            { phone: { $regex: searchTerm, $options: "i" } },
+          ],
+        }
+        : {},
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(Number(limit))
+    .lean();
+
+  // remove tickets where user didn't match search
+  const filteredTickets = tickets.filter((ticket) => ticket.user);
+
+  const total = await EventTicket.countDocuments(ticketFilter);
+
+  return {
+    event,
+    attendees: filteredTickets,
+    meta: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+    },
+  };
+};
+
 const updateEvent = async (id: string, payload: any) => {
   const result = await Event.findByIdAndUpdate(id, payload, {
     new: true,
@@ -106,6 +180,7 @@ export const EventService = {
   createEvent,
   getAllEvents,
   getSingleEvent,
+  getSingleEventWithUsers,
   updateEvent,
   deleteEvent,
 };

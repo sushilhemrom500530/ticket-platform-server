@@ -38,6 +38,12 @@ router.get(
     EventTicketController.getTicketById
 );
 
+router.get(
+    "/check-joined/:id",
+    auth("user"),
+    EventTicketController.checkEventJoined
+);
+
 router.patch(
     "/check-in/:ticketNumber",
     auth("admin"),

@@ -34,7 +34,6 @@ const eventTicketSchema = new Schema<IEventTicket>(
             enum: [
                 "pending",
                 "paid",
-                "checked_in",
                 "cancelled",
                 "expired",
             ],

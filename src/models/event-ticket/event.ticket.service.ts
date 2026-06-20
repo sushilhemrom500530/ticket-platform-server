@@ -5,6 +5,22 @@ import { generateTicketNumber } from "../../utils/generateTicketNumber";
 import { generateQRCode } from "../../utils/generateQRCode";
 import { EventTicket } from "./event.ticket.model";
 
+const checkEventJoined = async (
+    eventId: string,
+    userId: string
+) => {
+    const ticket = await EventTicket.findOne({
+        event: eventId,
+        user: userId,
+        status: { $in: ["paid", "pending"] }, // optional
+    }).select("_id ticketNumber status");
+
+    return {
+        isJoined: !!ticket,
+        ticket,
+    };
+};
+
 const purchaseTicket = async (
     userId: string,
     payload: {
@@ -20,19 +36,6 @@ const purchaseTicket = async (
         throw new AppError(
             StatusCodes.NOT_FOUND,
             "Event not found"
-        );
-    }
-
-    // Prevent duplicate purchase
-    const alreadyPurchased = await EventTicket.findOne({
-        event: payload.eventId,
-        user: userId,
-    });
-
-    if (alreadyPurchased) {
-        throw new AppError(
-            StatusCodes.BAD_REQUEST,
-            "You already joined this event"
         );
     }
 
@@ -158,6 +161,7 @@ const getTicketById = async (id: string, userId: string) => {
 };
 
 export const EventTicketService = {
+    checkEventJoined,
     purchaseTicket,
     verifyTicket,
     getTicketById,

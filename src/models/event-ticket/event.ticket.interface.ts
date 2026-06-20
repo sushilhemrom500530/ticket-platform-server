@@ -12,7 +12,6 @@ export interface IEventTicket {
     status:
     | "pending"
     | "paid"
-    | "checked_in"
     | "cancelled"
     | "expired";
     entryStatus: "checked_in" | "not_used";

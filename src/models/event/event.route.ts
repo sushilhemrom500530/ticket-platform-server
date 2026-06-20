@@ -26,7 +26,11 @@ router.post(
 );
 
 router.get("/", EventController.getAllEvents);
+
 router.get("/:id", EventController.getSingleEvent);
+
+
+router.get("/find/:id", EventController.getSingleEventWithUsers);
 
 router.put(
   "/:id",

@@ -5,6 +5,25 @@ import sendResponse from "../../utils/sendResponse";
 import { JwtUserPayload } from "../../middlewares/auth";
 import { EventTicketService } from "./event.ticket.service";
 
+const checkEventJoined = catchAsync(
+    async (req: Request, res: Response) => {
+        const { id: userId } = req.user as JwtUserPayload;
+
+        const result =
+            await EventTicketService.checkEventJoined(
+                req.params.id as string,
+                userId as string,
+            );
+
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Event joined checked successfully",
+            data: result,
+        });
+    }
+);
+
 const purchaseTicket = catchAsync(
     async (req: Request, res: Response) => {
         const { id: userId } = req.user as JwtUserPayload;
@@ -107,6 +126,7 @@ const getTicketById = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const EventTicketController = {
+    checkEventJoined,
     purchaseTicket,
     verifyTicket,
     getTicketById,
