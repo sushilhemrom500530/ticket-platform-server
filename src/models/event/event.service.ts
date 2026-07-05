@@ -132,6 +132,7 @@ const getSingleEventWithUsers = async (
             { name: { $regex: searchTerm, $options: "i" } },
             { email: { $regex: searchTerm, $options: "i" } },
             { phone: { $regex: searchTerm, $options: "i" } },
+            { ticketNumber: { $regex: searchTerm, $options: "i" } },
           ],
         }
         : {},
@@ -146,9 +147,92 @@ const getSingleEventWithUsers = async (
 
   const total = await EventTicket.countDocuments(ticketFilter);
 
+  // const metricsResult = await EventTicket.aggregate([
+  //   { $match: { event: new Types.ObjectId(eventId), status: "paid" } },
+  //   {
+  //     $group: {
+  //       _id: null,
+  //       totalSales: { $sum: "$quantity" },
+  //       checkedIn: {
+  //         $sum: { $cond: [{ $eq: ["$entryStatus", "checked_in"] }, "$quantity", 0] }
+  //       },
+  //       revenue: { $sum: "$totalFare" }
+  //     }
+  //   }
+  // ]);
+
+
+  const metricsResult = await EventTicket.aggregate([
+    {
+      $match: {
+        event: new Types.ObjectId(eventId),
+      },
+    },
+    {
+      $group: {
+        _id: null,
+
+        totalSales: {
+          $sum: {
+            $cond: [
+              {
+                $in: ["$status", ["paid", "expired"]],
+              },
+              "$quantity",
+              0,
+            ],
+          },
+        },
+
+        checkedIn: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$entryStatus", "checked_in"],
+              },
+              "$quantity",
+              0,
+            ],
+          },
+        },
+
+        absent: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $eq: ["$status", "expired"] },
+                  { $eq: ["$entryStatus", "not_used"] },
+                ],
+              },
+              "$quantity",
+              0,
+            ],
+          },
+        },
+
+        revenue: {
+          $sum: {
+            $cond: [
+              {
+                $in: ["$status", ["paid", "expired"]],
+              },
+              "$totalFare",
+              0,
+            ],
+          },
+        },
+      },
+    },
+  ]);
+
+  const metrics = metricsResult[0] || { totalSales: 0, checkedIn: 0, revenue: 0 };
+  metrics.absent = metrics.totalSales - metrics.checkedIn;
+
   return {
     event,
     attendees: filteredTickets,
+    metrics,
     meta: {
       page: Number(page),
       limit: Number(limit),

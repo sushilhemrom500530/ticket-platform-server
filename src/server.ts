@@ -8,6 +8,7 @@ import app from "./app";
 import { connectDB } from "./config/db";
 import { IP, PORT } from "./config";
 import 'dotenv/config';
+import { startJobs } from "./jobs";
 
 
 const numCPUs = os.cpus().length;
@@ -17,7 +18,7 @@ async function main() {
   try {
     await connectDB();
     // Start cron jobs
-    // startJob();
+    startJobs();
     // initSocket(server);
     // console.log("Socket.IO initialised!");
 
