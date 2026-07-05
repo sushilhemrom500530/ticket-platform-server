@@ -185,9 +185,10 @@ const verifyOtp = async (req: Request, otp: string) => {
 };
 
 const resendOtp = async (email: string) => {
-  const user = await TempUser.findOne({ email });
+  const tempUser = await TempUser.findOne({ email });
+  const user = await User.findOne({ email });
 
-  if (!user) {
+  if (!tempUser && !user) {
     throw new AppError(StatusCodes.BAD_REQUEST, "User account not found");
   }
   const existsOtpUser = await OTP.findOne({ email });
