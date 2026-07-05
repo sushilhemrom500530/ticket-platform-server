@@ -42,6 +42,15 @@ const userSchema = new Schema<IUser>(
     phoneNumber: {
       type: String,
     },
+    gender: {
+      type: String,
+    },
+    district: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
     profilePhoto: {
       type: String,
       default:

@@ -9,6 +9,9 @@ export interface IUser extends Document {
   phoneNumber: string;
   dateOfBirth?: string;
   address?: string;
+  gender?: string;
+  district?: string;
+  country?: string;
   profilePhoto?: string;
   provider?: "google" | "apple";
   providerId?: string;

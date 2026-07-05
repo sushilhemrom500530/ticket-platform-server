@@ -34,7 +34,7 @@ router.get(
 
 router.get(
     "/:id",
-    auth("user"),
+    auth("admin", "user"),
     EventTicketController.getTicketById
 );
 

@@ -4,6 +4,7 @@ import { Event } from "../event/event.model";
 import { generateTicketNumber } from "../../utils/generateTicketNumber";
 import { generateQRCode } from "../../utils/generateQRCode";
 import { EventTicket } from "./event.ticket.model";
+import { JwtUserPayload } from "../../middlewares/auth";
 
 const checkEventJoined = async (
     eventId: string,
@@ -148,13 +149,24 @@ const myTickets = async (userId: string) => {
     return result;
 };
 
-const getTicketById = async (id: string, userId: string) => {
-    const ticket = await EventTicket.findOne({ _id: id, user: userId })
-        .populate("event")
-        .populate("user");
+const getTicketById = async (id: string, user: JwtUserPayload) => {
+    let ticket;
+    if (user.role === "admin") {
+        ticket = await EventTicket.findOne({ _id: id })
+            .populate("event")
+            .populate("user");
 
-    if (!ticket) {
-        throw new AppError(StatusCodes.NOT_FOUND, "Ticket not found");
+        if (!ticket) {
+            throw new AppError(StatusCodes.NOT_FOUND, "Ticket not found");
+        }
+    } else {
+        ticket = await EventTicket.findOne({ _id: id, user: user.id })
+            .populate("event")
+            .populate("user");
+
+        if (!ticket) {
+            throw new AppError(StatusCodes.NOT_FOUND, "Ticket not found");
+        }
     }
 
     return ticket;
