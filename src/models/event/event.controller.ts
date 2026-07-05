@@ -3,19 +3,45 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { EventService } from "./event.service";
 import { StatusCodes } from "http-status-codes";
+
 const createEvent = catchAsync(async (req: Request, res: Response) => {
   const eventData = { ...req.body };
 
-  // ✅ Get uploaded file URL from middleware
-  const files = req.body.files as {
-    image?: string;
-  };
+  const files: any = req.body.files || {};
 
-  if (files?.image) {
-    eventData.image = files.image;
+  if (files.image) {
+    eventData.image = Array.isArray(files.image) ? files.image[0] : files.image;
   } else if (!eventData.image) {
-    // ✅ fallback default
     eventData.image = "https://placehold.co/600x400?text=Event+Image";
+  }
+
+  if (files["organizers.photo"] && Array.isArray(eventData.organizers)) {
+    const orgPhotos = Array.isArray(files["organizers.photo"])
+      ? files["organizers.photo"]
+      : [files["organizers.photo"]];
+
+    let photoIndex = 0;
+    eventData.organizers.forEach((organizer: any) => {
+      if (photoIndex < orgPhotos.length) {
+        organizer.photo = orgPhotos[photoIndex];
+        photoIndex++;
+      }
+    });
+  }
+
+
+  if (files["performers.profilePhoto"] && Array.isArray(eventData.performers)) {
+    const perfPhotos = Array.isArray(files["performers.profilePhoto"])
+      ? files["performers.profilePhoto"]
+      : [files["performers.profilePhoto"]];
+
+    let photoIndex = 0;
+    eventData.performers.forEach((performer: any) => {
+      if (photoIndex < perfPhotos.length) {
+        performer.profilePhoto = perfPhotos[photoIndex];
+        photoIndex++;
+      }
+    });
   }
 
   const result = await EventService.createEvent(eventData);
@@ -66,17 +92,42 @@ const getSingleEventWithUsers = catchAsync(async (req: Request, res: Response) =
 const updateEvent = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const eventData = { ...req.body };
+  const files: any = req.body.files || {};
 
-  // ✅ Get uploaded file URL from middleware
-  const files = req.body.files as {
-    image?: string;
-  };
-
-  if (files?.image) {
-    eventData.image = files.image;
+  if (files.image) {
+    eventData.image = Array.isArray(files.image) ? files.image[0] : files.image;
   }
 
-  const result = await EventService.updateEvent(id as string, eventData);
+  if (files["organizers.photo"] && Array.isArray(eventData.organizers)) {
+    const orgPhotos = Array.isArray(files["organizers.photo"])
+      ? files["organizers.photo"]
+      : [files["organizers.photo"]];
+
+    let photoIndex = 0;
+    eventData.organizers.forEach((organizer: any) => {
+      if (photoIndex < orgPhotos.length) {
+        organizer.photo = orgPhotos[photoIndex];
+        photoIndex++;
+      }
+    });
+  }
+
+  if (files["performers.profilePhoto"] && Array.isArray(eventData.performers)) {
+    const perfPhotos = Array.isArray(files["performers.profilePhoto"])
+      ? files["performers.profilePhoto"]
+      : [files["performers.profilePhoto"]];
+
+    let photoIndex = 0;
+    eventData.performers.forEach((performer: any) => {
+      if (photoIndex < perfPhotos.length) {
+        performer.profilePhoto = perfPhotos[photoIndex];
+        photoIndex++;
+      }
+    });
+  }
+
+  const result = await EventService.updateEvent(id as string, eventData as any);
+
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

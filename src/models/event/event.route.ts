@@ -10,7 +10,11 @@ const router = express.Router();
 router.post(
   "/",
   auth("admin"),
-  multiUploadHandler([{ name: "image", maxCount: 1 }]),
+  multiUploadHandler([
+    { name: "image", maxCount: 1 },
+    { name: "organizers.photo", maxCount: 10 },
+    { name: "performers.profilePhoto", maxCount: 10 },
+  ]),
   (req, res, next) => {
     if (req.body && req.body.data) {
       const files = (req.body as any).files;
@@ -35,7 +39,11 @@ router.get("/find/:id", EventController.getSingleEventWithUsers);
 router.put(
   "/:id",
   auth("admin"),
-  multiUploadHandler([{ name: "image", maxCount: 1 }]),
+  multiUploadHandler([
+    { name: "image", maxCount: 1 },
+    { name: "organizers.photo", maxCount: 10 },
+    { name: "performers.profilePhoto", maxCount: 10 },
+  ]),
   (req, res, next) => {
     if (req.body && req.body.data) {
       const files = (req.body as any).files;

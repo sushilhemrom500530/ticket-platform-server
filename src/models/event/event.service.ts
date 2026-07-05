@@ -61,7 +61,7 @@ const getAllEvents = async (query: any) => {
     .populate("categoryId")
     .skip(skip)
     .limit(Number(limit))
-    .sort({ date: 1 })
+    .sort({ createdAt: -1 })
     .lean();
 
   const total = await Event.countDocuments(filter);
