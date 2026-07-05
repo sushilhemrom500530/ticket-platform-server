@@ -98,28 +98,28 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
     eventData.image = Array.isArray(files.image) ? files.image[0] : files.image;
   }
 
-  if (files["organizers.photo"] && Array.isArray(eventData.organizers)) {
+  if (Array.isArray(eventData.organizers)) {
     const orgPhotos = Array.isArray(files["organizers.photo"])
       ? files["organizers.photo"]
-      : [files["organizers.photo"]];
+      : files["organizers.photo"] ? [files["organizers.photo"]] : [];
 
     let photoIndex = 0;
     eventData.organizers.forEach((organizer: any) => {
-      if (photoIndex < orgPhotos.length) {
+      if (organizer.photo === "NEW_FILE" && photoIndex < orgPhotos.length) {
         organizer.photo = orgPhotos[photoIndex];
         photoIndex++;
       }
     });
   }
 
-  if (files["performers.profilePhoto"] && Array.isArray(eventData.performers)) {
+  if (Array.isArray(eventData.performers)) {
     const perfPhotos = Array.isArray(files["performers.profilePhoto"])
       ? files["performers.profilePhoto"]
-      : [files["performers.profilePhoto"]];
+      : files["performers.profilePhoto"] ? [files["performers.profilePhoto"]] : [];
 
     let photoIndex = 0;
     eventData.performers.forEach((performer: any) => {
-      if (photoIndex < perfPhotos.length) {
+      if (performer.profilePhoto === "NEW_FILE" && photoIndex < perfPhotos.length) {
         performer.profilePhoto = perfPhotos[photoIndex];
         photoIndex++;
       }

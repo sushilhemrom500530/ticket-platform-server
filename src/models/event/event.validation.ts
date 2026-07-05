@@ -1,5 +1,27 @@
 import { z } from "zod";
 
+// Shared sub-schema for Organizers
+const organizerSchema = z.object({
+  _id: z.string().optional(),
+  name: z.string().optional(),
+  contactNumber: z.string().optional(),
+  address: z.string().optional(),
+  description: z.string().optional(),
+  photo: z.string().optional(), // Can be URL or "NEW_FILE"
+});
+
+// Shared sub-schema for Performers
+const performerSchema = z.object({
+  _id: z.string().optional(),
+  name: z.string().optional(),
+  contactNumber: z.string().optional(),
+  address: z.string().optional(),
+  passion: z.string().optional(),
+  bio: z.string().optional(),
+  description: z.string().optional(),
+  profilePhoto: z.string().optional(), // Can be URL or "NEW_FILE"
+});
+
 const createEvent = z.object({
   title: z.string({ message: "Title is required" }),
   description: z.string({ message: "Description is required" }),
@@ -7,11 +29,10 @@ const createEvent = z.object({
   date: z.string({ message: "Date is required" }),
   location: z.string({ message: "Location is required" }),
   isPremium: z.boolean().optional(),
-  price: z.preprocess((val) => (typeof val === "string" ? parseFloat(val) : val), z.number().optional()),
-  totalTickets: z.preprocess((val) => (typeof val === "string" ? parseInt(val, 10) : val), z.number({ message: "Total tickets is required" }).min(1)),
-}).refine((data) => !data.isPremium || (data.price && data.price > 0), {
-  message: "Price is required and must be greater than 0 for premium events",
-  path: ["price"],
+  price: z.preprocess((val) => (val ? parseFloat(val as string) : 0), z.number().optional()),
+  totalTickets: z.preprocess((val) => parseInt(val as string, 10), z.number().min(1)),
+  organizers: z.array(organizerSchema).optional(),
+  performers: z.array(performerSchema).optional(),
 });
 
 const updateEvent = z.object({
@@ -21,8 +42,10 @@ const updateEvent = z.object({
   date: z.string().optional(),
   location: z.string().optional(),
   isPremium: z.boolean().optional(),
-  price: z.preprocess((val) => (typeof val === "string" ? parseFloat(val) : val), z.number().optional()),
-  totalTickets: z.preprocess((val) => (typeof val === "string" ? parseInt(val, 10) : val), z.number().min(1).optional()),
+  price: z.preprocess((val) => (val ? parseFloat(val as string) : undefined), z.number().optional()),
+  totalTickets: z.preprocess((val) => (val ? parseInt(val as string, 10) : undefined), z.number().optional()),
+  organizers: z.array(organizerSchema).optional(),
+  performers: z.array(performerSchema).optional(),
 });
 
 export const eventValidation = {
