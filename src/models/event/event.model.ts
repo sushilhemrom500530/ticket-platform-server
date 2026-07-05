@@ -1,6 +1,60 @@
 import { model, Schema } from "mongoose";
 import { IEvent } from "./event.interface";
 
+const organizerSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  contactNumber: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: false
+  },
+  photo: {
+    type: String,
+    required: false
+  },
+},);
+
+const performerSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  contactNumber: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  passion: {
+    type: String,
+    required: true
+  },
+  bio: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: false
+  },
+  profilePhoto: {
+    type: String,
+    required: false
+  },
+},);
+
 const eventSchema = new Schema<IEvent>(
   {
     title: {
@@ -46,6 +100,8 @@ const eventSchema = new Schema<IEvent>(
       type: Number,
       default: 0,
     },
+    organizers: [organizerSchema],
+    performers: [performerSchema],
   },
   { timestamps: true }
 );
