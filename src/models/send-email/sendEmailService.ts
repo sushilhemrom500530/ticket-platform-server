@@ -1,34 +1,26 @@
 import nodemailer from "nodemailer";
-import { OTP } from "./../user/user.model";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { OTP } from "../user/user.model";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const transporter = nodemailer.createTransport({
-  service: "gmail",
   host: "smtp.gmail.com",
-  port: 465,
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.Nodemailer_GMAIL,
     pass: process.env.Nodemailer_GMAIL_PASSWORD,
   },
-  secure: true,
-
-  // host: "mail.betopiagroup.com",
-  // port: 587,
-  // secure: false,
-  // auth: {
-  //   user: process.env.Nodemailer_GMAIL,
-  //   pass: process.env.Nodemailer_GMAIL_PASSWORD,
-  // },
 });
 
 export const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
+
 export const getStoredOTP = async (email: string) => {
   const otpData = await OTP.findOne({ email: email.toLowerCase() });
 
@@ -46,15 +38,19 @@ export const getStoredOTP = async (email: string) => {
 };
 
 export const saveOTP = async (email: string, otp: string) => {
-  await OTP.findOneAndUpdate(
+
+  return await OTP.findOneAndUpdate(
     { email: email.toLowerCase() },
     {
       email: email.toLowerCase(),
       otp,
-      expiresAt: new Date(Date.now() + 160 * 1000), // 2 minutes expiry
+      expiresAt: new Date(Date.now() + 160 * 1000),
       verified: false,
     },
-    { upsert: true },
+    {
+      upsert: true,
+      new: true,
+    },
   );
 };
 

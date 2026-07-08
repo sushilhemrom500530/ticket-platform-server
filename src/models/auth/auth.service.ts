@@ -18,9 +18,11 @@ const userRegister = async (payload: IUser) => {
   const { email } = payload;
   const user = await TempUser.create(payload);
   const otp = generateOTP();
-  await saveOTP(email, otp);
+  console.log(otp);
+  const otpRes = await saveOTP(email, otp);
+  console.log(otpRes);
   await sendOTPEmail(email, otp);
-
+  console.log("Email sent"); 0
   // --- JWT Token ---
   const accessToken = jwt.sign(
     { email, role: payload.role, id: user._id },
