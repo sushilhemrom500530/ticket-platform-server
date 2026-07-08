@@ -13,6 +13,10 @@ const menubarSchema = new Schema<IMenubar>(
       required: true,
       trim: true,
     },
+    isEvent: {
+      type: Boolean,
+      default: false,
+    },
     icon: {
       type: String,
       trim: true,

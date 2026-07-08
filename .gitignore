@@ -7,6 +7,4 @@ distuploads/
 /dist 
 config.bat
 
-.env
-.env*
 env.local
